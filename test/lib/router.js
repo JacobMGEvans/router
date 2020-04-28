@@ -1160,6 +1160,35 @@ describe('Router', function () {
         done();
       }, error => done(error));
     });
+
+    it('handles logical path with no params', function (done) {
+      var app = new Koa();
+      var router = new Router();
+
+      router.use(function(ctx, next) {
+       
+        return next();
+      });
+
+      router.get('/foo/:id', function(ctx) {
+        console.log(ctx.params)
+        ctx.body = ctx.params;
+      });
+
+      router.params = true;
+      app.use(router.routes());
+      // console.log(router)
+      request(http.createServer(app.callback()))
+        .get('/foo/1701')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+
+          // expect(res.body).to.have.property('id', '815');
+          expect(res.body).to.not.have.property('0');
+          done();
+        });
+    });
   });
 
   describe('Router#register()', function () {
